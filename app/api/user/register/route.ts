@@ -3,6 +3,8 @@ import { connectDB } from "@/utils/db.config";
 import { sendError, sendSuccess } from "@/utils/response";
 import { uploadToCloudinary } from "@/utils/cloudinary";
 import User from "@/models/User.model";
+import { sendMail } from "@/utils/sendMail";
+import jwt from "jsonwebtoken";
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,7 +32,21 @@ export async function POST(request: NextRequest) {
       }
     }
     const newUser = await User.create(user);
-
+    if(!newUser){
+      return sendError("failed to create user", 500);
+    }
+    const token = jwt.sign(
+      { userId: newUser._id },
+      process.env.JWT_SECRET!,
+      { expiresIn: "1d" }
+    );
+    newUser.emailVerificationToken = token;
+    await newUser.save();
+    await sendMail({
+      token: newUser.emailVerificationToken,
+      email: newUser.email,
+      name: newUser.userName,
+    });
     return sendSuccess({}, "user created successfully", 200);
   } catch (error) {
     console.error("Error in user route:", error);

@@ -6,7 +6,7 @@ import { useState } from "react";
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
-    <header className="bg-linear-to-r from-gray-100/20 to-red-50/20 shadow-md p-2 backdrop-blur-xl fixed w-full z-10">
+    <header className="bg-linear-to-r from-purple-400/20 to-purple-700/20 shadow-xl p-2 backdrop-blur-xl fixed w-full z-10">
       <div className="container mx-auto px-3 flex justify-between items-center">
         <div className="flex items-center">
           <Image src="/images/logo.svg" alt="Logo" width={70} height={70} loading="eager" />
@@ -14,7 +14,7 @@ function Header() {
             <h3 className="text-md font-bold text-gray-200">
               NexaTech Solutions
             </h3>
-            <h1 className="text-xl font-semibold text-purple-950">EventHive</h1>
+            <h1 className="text-xl font-semibold text-purple-300">EventHive</h1>
           </div>
         </div>
         <nav className="">

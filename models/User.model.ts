@@ -10,6 +10,8 @@ import bcrypt from 'bcrypt';
   role: 'admin' | 'user' | 'organizer';
   createdAt: Date;
   updatedAt: Date;
+  emailVerified: boolean;
+  emailVerificationToken?: string;
   comparePassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -25,7 +27,7 @@ const userSchema = new Schema<IUser>(
       trim: true,
       minlength: [3, 'Username must be at least 3 characters long'],
       maxlength: [30, 'Username must not exceed 30 characters'],
-      match: [/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens'],
+      // match: [/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens'],
     },
     email: {
       type: String,
@@ -51,6 +53,14 @@ const userSchema = new Schema<IUser>(
         message: 'Role must be one of: admin, user, or organizer',
       },
       default: 'user',
+    },
+    emailVerified:{
+      type: Boolean,
+      default: false,
+    },
+    emailVerificationToken:{
+      type: String,
+      default: null,
     },
   },
   {
