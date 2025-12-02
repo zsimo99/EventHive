@@ -1,0 +1,12 @@
+Exchange Arrow Proposal - DB - 2.3 - Belgium
+
+[Header]
+Customer="DASC B.V.";"";"0003356546";"";""
+EndUser="Bureau Nationale Ombudsman";"";"0003262551";"Bezuidenhoutseweg 151, NLD"
+Contract="null";"null";"";"BP-Led";"VAR";"";""
+SourceDocument="ProActive Renewal Quote";"0027437042";"01 Mar 2026";"serhiy.odyntsov@sk.ibm.com"
+
+[Lines]
+Count="1"
+Sums="";"908.0";"";""
+L1="E09NNLL";"STATS CLIENT BASE AUTH USER ANNUAL SW S&S RNWL";"";"";"S&S|";"01 Mar 2026";"28 Feb 2027";"12";"1";"";"0";"908.00";"";"0|";"908.00";"";"";"";"";"";"";""
