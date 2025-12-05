@@ -48,7 +48,7 @@ function page() {
         toast.success(
           "Registration successful! Please verify your email before logging in."
         );
-        router.push("/auth/login");
+        router.push("/login");
       } else {
         const data = await res.json();
         toast.error(data.message || "Registration failed. Please try again.");

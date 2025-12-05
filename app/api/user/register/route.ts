@@ -48,10 +48,10 @@ export async function POST(request: NextRequest) {
       name: newUser.userName,
     });
     return sendSuccess({}, "user created successfully", 200);
-  } catch (error) {
+  } catch (error :any) {
     //check if error from mongoose validation
-    if (error instanceof Error && error.name === "ValidationError") {
-      const errors= Object.keys(error.errors).map(key=>({[key]:error.errors[key].message}))
+    if (error.name === "ValidationError") {
+      const errors= Object.keys((error as any).errors).map(key=>({[key]:error.errors[key].message}))
       console.log(errors);
       return sendError("please check all fields", 400,errors);
     }
