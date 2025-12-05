@@ -49,7 +49,12 @@ export async function POST(request: NextRequest) {
     });
     return sendSuccess({}, "user created successfully", 200);
   } catch (error) {
-    console.error("Error in user route:", error);
+    //check if error from mongoose validation
+    if (error instanceof Error && error.name === "ValidationError") {
+      const errors= Object.keys(error.errors).map(key=>({[key]:error.errors[key].message}))
+      console.log(errors);
+      return sendError("please check all fields", 400,errors);
+    }
     return sendError("Internal Server Error", 500);
   }
 }

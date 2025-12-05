@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
     await connectDB();
     const { searchParams } = new URL(request.url);
     const token = searchParams.get("token");
+    console.log("Received token:", token);
     if (!token) {
       return sendError("Verification token is missing", 400);
     }
