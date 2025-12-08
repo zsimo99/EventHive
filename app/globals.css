@@ -3,7 +3,9 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-
+*{
+    @apply  scroll-smooth;
+}
 .link_item{
     @apply text-gray-200 hover:text-white hover:scale-105 transition-all  text-left;
 }
