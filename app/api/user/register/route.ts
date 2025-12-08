@@ -42,11 +42,15 @@ export async function POST(request: NextRequest) {
     );
     newUser.emailVerificationToken = token;
     await newUser.save();
-    await sendMail({
+    try {
+      await sendMail({
       token: newUser.emailVerificationToken,
       email: newUser.email,
       name: newUser.userName,
     });
+    } catch (error) {
+      return sendError("failed to send verification email please try later", 500);
+    }
     return sendSuccess({}, "user created successfully", 200);
   } catch (error :any) {
     //check if error from mongoose validation

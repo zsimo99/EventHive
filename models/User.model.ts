@@ -1,7 +1,8 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
- interface IUser extends Document {
+ export interface IUser extends Document {
   avatar?: string;
   userName: string;
   email: string;
@@ -13,6 +14,7 @@ import bcrypt from 'bcrypt';
   emailVerified: boolean;
   emailVerificationToken?: string;
   comparePassword(enteredPassword: string): Promise<boolean>;
+  generateTokens(): { accessToken: string; refreshToken: string };
 }
 
 const userSchema = new Schema<IUser>(
@@ -27,14 +29,14 @@ const userSchema = new Schema<IUser>(
       trim: true,
       minlength: [3, 'Username must be at least 3 characters long'],
       maxlength: [30, 'Username must not exceed 30 characters'],
-      // match: [/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens'],
+      match: [/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens'],
     },
     email: {
       type: String,
       required: [true, 'Email is required'],
       unique: true,
       lowercase: true,
-      // match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email'],
+      match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email'],
     },
     password: {
       type: String,
@@ -61,6 +63,7 @@ const userSchema = new Schema<IUser>(
     emailVerificationToken:{
       type: String,
       default: null,
+      select: false,
     },
   },
   {
@@ -88,6 +91,21 @@ userSchema.methods.comparePassword = async function (
   enteredPassword: string
 ): Promise<boolean> {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+userSchema.methods.generateTokens = function () {
+  const payload = { _id: this._id };
+
+  // Access token: short-lived
+  const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET!, {
+    expiresIn: "15m", // 15 minutes
+  });
+
+  // Refresh token: long-lived
+  const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET!, {
+    expiresIn: "7d", // 7 days
+  });
+
+  return { accessToken, refreshToken };
 };
 
 const User : Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);

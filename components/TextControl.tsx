@@ -1,5 +1,5 @@
 "use client";
-import React, { use } from "react";
+import React from "react";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
 
 function TextControl({
@@ -18,14 +18,14 @@ function TextControl({
   const [onTop, setOnTop] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
   return (
-    <>
+    <div>
       <div className="relative z-0">
         <label
           className={`absolute top-0 -z-10 left-0 transition-all duration-75 ${
             onTop
-              ? "-translate-y-1/2 text-gray-200 font-bold text-xs"
+              ? "-translate-y-1/2 text-fuchsia-600  font-bold text-xs"
               : "translate-y-1/2"
-          } ${error && "text-red-400"}`}
+          } ${error && "text-red-600!"}`}
           htmlFor=""
         >
           {label}
@@ -35,9 +35,9 @@ function TextControl({
           onClick={() => setOnTop(true)}
           onBlur={() => value.length === 0 && setOnTop(false)}
           className={`w-full outline-none border-b border-gray-500 py-2 ps-3 ${
-            error && "border-red-400"
-          }`}
-          type={(type==="password"&&showPassword) ? "text" : type}
+            error && "border-red-600"
+          } ${onTop && !error &&  "border-fuchsia-600!"}`}
+          type={(type==="password" && showPassword) ? "text" : type}
           value={value}
           onChange={(e) => setValue(e.target.value)}
         />
@@ -52,7 +52,7 @@ function TextControl({
         )}
       </div>
       <p className="text-red-500">{error}</p>
-    </>
+    </div>
   );
 }
 
