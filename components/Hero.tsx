@@ -11,7 +11,7 @@ import { FaAngleDoubleDown } from "react-icons/fa";
 function Hero() {
   return (
     <div className="mx-auto relative min-h-svh bg-linear-to-b from-indigo-700 to-fuchsia-600  text-white">
-      <div className="container relative mx-auto px-3 pt-48 md:pt-40 xl:pt-32 2xl:pt-60 flex items-center md:gap-16 h-full ">
+      <div className="container relative mx-auto px-3 pt-48 md:pt-40 xl:pt-[125px] 2xl:pt-60 flex items-center md:gap-16 h-full ">
         <div className="flex-1 max-md:basis-6/12 h-full ">
           <h4 className="flex max-lg:mx-auto bg-gray-200/10 w-fit px-3 py-1 rounded-full items-center gap-2 text-xs md:text-md mb-4">
             <BsStars />
@@ -61,7 +61,7 @@ function Hero() {
       </div>
         <a
           className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-white opacity-75 hover:opacity-100"
-          href="#Featured"
+          href="#featured"
         >
           <FaAngleDoubleDown  size={40} />
         </a>
