@@ -1,7 +1,7 @@
 import { verifyRefreshToken } from "@/lib/auth";
 import User from "@/models/User.model";
 import { sendError, sendSuccess } from "@/utils/response";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 
 export async function POST(req: NextRequest) {
@@ -12,11 +12,11 @@ export async function POST(req: NextRequest) {
         }
         const decoded = verifyRefreshToken(refreshToken);
         if (!decoded) {
-            return sendError("Invalid refresh token", 401);
+            throw new Error("Invalid refresh token");
         }
         const user = await User.findById((decoded as any)._id).select("+refreshToken");
         if (!user || user.refreshToken !== refreshToken) {
-            return sendError("Invalid refresh token", 401);
+            throw new Error("Invalid refresh token");
         }
         const { accessToken , refreshToken: newRefreshToken } = user.generateTokens();
         user.refreshToken = newRefreshToken;
@@ -30,6 +30,9 @@ export async function POST(req: NextRequest) {
             },
         ]);
     } catch (error) {
-        return sendError("Internal server error", 500);
+        const res=NextResponse.json({message:"Internal server error"}, {status:500});
+        res.cookies.delete("refreshToken");
+        res.cookies.delete("accessToken");
+        return res
     }
 }

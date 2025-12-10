@@ -14,7 +14,6 @@ async function page({
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/event?category=${category}&search=${search}&page=${page}`,
-        { cache: "no-store" }
       );
       const data = await res.json();
 

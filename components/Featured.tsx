@@ -6,12 +6,12 @@ async function Featured() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/event`, {
         // ensure this works during prerender
-        cache: "no-store",
       });
       const data = await res.json();
 
-      if (data.success && Array.isArray(data.data)) {
-        return { events: data.data, error: "" };
+      if (data.success && Array.isArray(data.data.events)) {
+
+        return { events: data.data.events, error: "" };
       }
 
       return {

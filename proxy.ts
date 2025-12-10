@@ -1,6 +1,5 @@
 // proxy.ts
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import { verifyAccessToken } from "./lib/auth";
 
 export default async function handler(req: NextRequest) {

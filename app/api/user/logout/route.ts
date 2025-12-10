@@ -28,6 +28,6 @@ export async function POST(req: NextRequest) {
             }
         ]);
     } catch (error) {
-        sendError("Failed to logout user", 500);
+        return sendError("Internal server error", 500);
     }
 }

@@ -20,8 +20,8 @@ export async function POST(req: NextRequest) {
     const date = new Date(formfData.get("date") as string);
     const location = formfData.get("location") as string;
     const price = parseFloat(formfData.get("price") as string);
-    // const category = formfData.get("category") as "concerts" | "workshops" | "conferences";
-    // const capacity = parseInt(formfData.get("capacity") as string);
+    const category = formfData.get("category") as "concerts" | "workshops" | "conferences";
+    const capacity = parseInt(formfData.get("capacity") as string);
     const tags =
       formfData
         .get("tags")
@@ -31,9 +31,7 @@ export async function POST(req: NextRequest) {
         .map((tag) => tag.trim()) || [];
     const image = formfData.get("image") as File;
     //convert
-    const categories = ["concerts", "workshops", "conferences"];
-    const category = categories[Math.floor(Math.random() * categories.length)];
-    const capacity = Math.floor(Math.random() * (500 - 50 + 1)) + 50;
+  
     // pm.variables.set("capacity", capacity);
 
     if (
@@ -62,7 +60,7 @@ export async function POST(req: NextRequest) {
 
     const payload = verifyAccessToken(token);
     if (!payload) {
-      return sendError("token invalid", 401);
+      return sendError("unvalide-token", 401);
     }
     const user = await User.findById(payload._id);
     if (!user) {

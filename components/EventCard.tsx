@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { FiDollarSign } from "react-icons/fi";
 import {
   IoCalendarClearOutline,
@@ -86,9 +87,9 @@ function EventCard({ ...props }) {
             </span>
             {props.price}
           </p>
-          <button className="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors duration-300">
+          <Link href={`/browse/${props._id}`} className="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors duration-300">
             View Details
-          </button>
+          </Link>
         </div>
       </div>
     </div>
