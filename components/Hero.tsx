@@ -1,7 +1,7 @@
 import React from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import HeroCard from "./HeroCard";
-import HeroSearch from "./HeroSearch";
+import HeroSearch from "./search";
 import HeroStats from "./HeroStats";
 import { BsStars } from "react-icons/bs";
 import { IoIosSearch } from "react-icons/io";
@@ -9,6 +9,7 @@ import { CiCalendar } from "react-icons/ci";
 import { FaAngleDoubleDown } from "react-icons/fa";
 
 function Hero() {
+
   return (
     <div className="mx-auto relative min-h-svh bg-linear-to-b from-indigo-700 to-fuchsia-600  text-white">
       <div className="container relative mx-auto px-3 pt-48 md:pt-40 xl:pt-[125px] 2xl:pt-60 flex items-center md:gap-16 h-full ">
@@ -25,7 +26,7 @@ function Hero() {
             Connect with concerts, workshops, and conferences that inspire you.
             Book instantly and manage everything in one place.
           </p>
-          <div className="max-lg:px-10 my-5">
+          <div className=" my-5">
             <HeroSearch />
           </div>
           <HeroStats />

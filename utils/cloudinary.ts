@@ -8,3 +8,4 @@ export const uploadToCloudinary = async (fileBuffer:Buffer,folder:string):Promis
         }).end(fileBuffer)
     })
 }
+

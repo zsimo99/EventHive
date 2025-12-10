@@ -24,27 +24,28 @@ function EventCard({ ...props }) {
   };
   return (
     <div className="xl:basis-[calc(33.333%-1rem)] md:basis-[calc(50%-1rem)] basis-full  bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 eventCard">
-      <div className="relative w-full h-48 ">
+      <div className="relative w-full h-48">
         <Image
           src={props.image}
           alt={props.title}
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
           className="object-cover"
         />
         <div className="absolute w-full top-4 left-0 px-4 text-white text-[13px] flex justify-between gap-1">
           <span
-            className={` rounded-2xl px-2 py-0.5 ${
-              props.category == "concert"
-                ? "bg-purple-600/70"
-                : props.category == "workshop"
-                ? "bg-green-600/70"
-                : "bg-red-500/70"
-            }`}
+        className={`rounded-2xl px-2 py-0.5 ${
+          props.category == "concerts"
+            ? "bg-purple-600/70"
+            : props.category == "workshops"
+            ? "bg-green-600/70"
+            : "bg-red-500/70"
+        }`}
           >
-            {props.category}
+        {props.category.slice(0, -1)}
           </span>
           <span className="bg-indigo-600/70 rounded-2xl px-2 py-0.5">
-            Featured
+        Featured
           </span>
         </div>
       </div>
@@ -52,7 +53,7 @@ function EventCard({ ...props }) {
         <h3 className="text-lg font-semibold mb-2">{props.title}</h3>
         <div className="text-gray-600 flex items-center gap-2 text-sm mb-2">
           <IoCalendarClearOutline />
-          <span>{formateDate(new Date(`${props.date}T${props.time}`))}</span>
+          <span>{formateDate(new Date(props.date))}</span>
         </div>
         <div className="text-gray-600 flex items-center gap-2 text-sm mb-2">
           <IoLocationOutline />

@@ -5,7 +5,8 @@ import { use, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { logout } from "@/lib/authSlice";
-
+import { IoIosLogOut } from "react-icons/io";
+import UserIcon from "./UserIcon";
 
 const navItems = [
   { name: "concerts", path: "/browse?category=concerts" },
@@ -15,9 +16,9 @@ const navItems = [
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const dispatch = useDispatch()
-  const {isLoggedIn,user}=useSelector((state:any)=>state.auth)
-  console.log("user in header:",user);
+  const dispatch = useDispatch();
+  const { isLoggedIn, user } = useSelector((state: any) => state.auth);
+  console.log("user in header:", user);
   // const isLoggedIn =true
   const logoutfunc = async () => {
     try {
@@ -28,16 +29,14 @@ function Header() {
       if (data.success) {
         toast.success("Logout successful");
         dispatch(logout());
-        
-      }
-      else throw new Error();
+      } else throw new Error();
     } catch (error) {
       toast.error("Logout failed");
     }
   };
   return (
-    <header className="bg-linear-to-r from-purple-800/70 to-purple-700/70 shadow-xl backdrop-blur-xl fixed w-full z-10">
-      <div className="container mx-auto px-3 flex justify-between items-center relative py-1">
+    <header className="bg-linear-to-r from-purple-800/60 to-purple-700/60 shadow-lg backdrop-blur-xl fixed w-full z-10">
+      <div className="container mx-auto px-3 flex justify-between items-center relative py-1 shadow-2xl shadow-purple-900/50">
         <Link href="/" className="flex items-center">
           <Image src="/images/logo.svg" alt="Logo" width={70} height={70} />
           <div className="font-poppins">
@@ -97,7 +96,11 @@ function Header() {
                   </Link>
                 </>
               ) : (
-                <button onClick={logoutfunc} className="bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-colors shadow-sm">
+                <button
+                  onClick={logoutfunc}
+                  className="bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+                >
+                  <IoIosLogOut />
                   Logout
                 </button>
               )}
@@ -115,28 +118,27 @@ function Header() {
           </ul>
         </nav>
         <div className="max-lg:hidden flex items-center gap-4">
-          {isLoggedIn?
-          <>
-          <p className="text-gray-200">welcome back {user?.userName}</p>
-          <button onClick={logoutfunc} className="bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-colors shadow-sm">
-            Logout
-          </button>
-          </>
-          :
-          <>
-          <Link
-            href="/login"
-            className="text-gray-200 hover:text-blue-300 transition-colors px-4 py-2 text-left"
-          >
-            Sign In
-          </Link>
-          <Link
-            href="/register"
-            className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-          >
-            Get Started
-          </Link>
-          </>}
+          {isLoggedIn ? (
+            <>
+              <p className="text-gray-200">welcome back {user?.userName}</p>
+              <UserIcon logout={logoutfunc} />
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="text-gray-200 hover:text-blue-300 transition-colors px-4 py-2 text-left"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/register"
+                className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+              >
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

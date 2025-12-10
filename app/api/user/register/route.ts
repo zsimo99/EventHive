@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
         const buffer = Buffer.from(arrayBuffer);
         user.avatar = await uploadToCloudinary(buffer, "avatar");
       } catch (error) {
-        sendError("somthing went wrong while uploading the image", 400);
+        return sendError("somthing went wrong while uploading the image", 400);
       }
     }
     const newUser = await User.create(user);

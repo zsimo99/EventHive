@@ -17,10 +17,17 @@ export async function GET(req:NextRequest) {
     }
     const user= await User.findById(decoded._id)
 
+
     if(!user){
         return sendError("User not found",404);
     }
-    return sendSuccess(user,"User fetched successfully",200);
+    const data = {
+      _id: user._id,
+      userName: user.userName,
+      email: user.email,
+      role: user.role,
+    };
+    return sendSuccess(data,"User fetched successfully",200);
    } catch (error) {
     return sendError("Internal server error",500);
    }

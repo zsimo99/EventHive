@@ -1,6 +1,7 @@
 // proxy.ts
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { verifyAccessToken } from "./lib/auth";
 
 export default async function handler(req: NextRequest) {
   const token = req.cookies.get("accessToken")?.value; // or access token/cookie you use
@@ -12,12 +13,12 @@ export default async function handler(req: NextRequest) {
   const isProtected = protectedRoutes.some(
     (route) => pathname == route || pathname.startsWith(route + "/")
   );
-  if (isProtected && !token) {
-    // console.log("Unauthorized access attempt to protected route:", pathname);
+  const tokenValide=verifyAccessToken(token || "");
+  if (isProtected && !tokenValide) {
     url.pathname = "/unauthorized";
     return NextResponse.redirect(url);
   }
-  if (token && (pathname === "/login" || pathname === "/register")) {
+  if (tokenValide && (pathname === "/login" || pathname === "/register")) {
     url.pathname = "/";
     return NextResponse.redirect(url);
   }
