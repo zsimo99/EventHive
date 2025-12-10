@@ -35,7 +35,7 @@ async function page({
       </div>
     );
   }
-  return (
+  if(events)return (
     <div className="bg-gray-200 min-w-screen pt-16 pb-32">
       <div className="container mx-auto px-4 py-16 ">
         <div className="flex gap-4 items-center mb-8 justify-between">
@@ -56,7 +56,10 @@ async function page({
         </div>
       </div>
     </div>
-  );
+  )
+  if(!events) return <div className='bg-gray-100 py-32 ' id='featured'>
+    <h1 className="text-3xl font-bold mb-8 text-center text-gray-700">Featured Events</h1>
+  </div>
 }
 
 export default page;

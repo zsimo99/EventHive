@@ -32,6 +32,9 @@ async function Featured() {
     </div>
 
   )
+  if(!events) return <div className='bg-gray-100 py-32 ' id='featured'>
+    <h1 className="text-3xl font-bold mb-8 text-center text-gray-700">Featured Events</h1>
+  </div>
 }
 
 export default Featured
