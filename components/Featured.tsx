@@ -1,44 +1,43 @@
-// import { events } from '@/data/events'
 import React from 'react'
 import EventCard from './EventCard'
 
 async function Featured() {
-  // const fetchEvents = async () => {
-  //   try {
-  //     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/event`, {
-  //       // ensure this works during prerender
-  //       cache: "no-store",
-  //     });
-  //     const data = await res.json();
+  const fetchEvents = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/event`, {
+        // ensure this works during prerender
+        cache: "no-store",
+      });
+      const data = await res.json();
 
-  //     if (data.success && Array.isArray(data.data)) {
-  //       return { events: data.data, error: "" };
-  //     }
+      if (data.success && Array.isArray(data.data)) {
+        return { events: data.data, error: "" };
+      }
 
-  //     return {
-  //       events: [],
-  //       error: "Failed to fetch events",
-  //     };
-  //   } catch (error) {
-  //     return {
-  //       events: [],
-  //       error: "Failed to fetch events",
-  //     };
-  //   }
-  // };
+      return {
+        events: [],
+        error: "Failed to fetch events",
+      };
+    } catch (error) {
+      return {
+        events: [],
+        error: "Failed to fetch events",
+      };
+    }
+  };
 
-  // const { events, error } = await fetchEvents();
+  const { events, error } = await fetchEvents();
 
-  // if (error) {
-  //   return (
-  //     <div className="bg-gray-100 py-32" id="featured">
-  //       <h1 className="text-3xl font-bold mb-8 text-center text-gray-700">
-  //         Featured Events
-  //       </h1>
-  //       {/* Optionally show the error text */}
-  //     </div>
-  //   );
-  // }
+  if (error) {
+    return (
+      <div className="bg-gray-100 py-32" id="featured">
+        <h1 className="text-3xl font-bold mb-8 text-center text-gray-700">
+          Featured Events
+        </h1>
+        {/* Optionally show the error text */}
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-100 py-32" id="featured">
@@ -46,9 +45,9 @@ async function Featured() {
         Featured Events
       </h1>
       <div className="container mx-auto px-4 flex flex-wrap gap-4 justify-start">
-        {/* {events.map((e: any) => (
+        {events.map((e: any) => (
           <EventCard key={e._id} booked={20} {...e} />
-        ))} */}
+        ))}
       </div>
     </div>
   );

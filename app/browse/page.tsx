@@ -10,40 +10,39 @@ async function page({
 }) {
   const { category = "", search = "", page = "1" } = await searchParams;
 
-  // const fetchEvents = async () => {
-  //   try {
-  //     const res = await fetch(
-  //       `${process.env.NEXT_PUBLIC_BASE_URL}/api/event?category=${category}&search=${search}&page=${page}`,
-  //       { cache: "no-store" }
-  //     );
-  //     const data = await res.json();
+  const fetchEvents = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/event?category=${category}&search=${search}&page=${page}`,
+        { cache: "no-store" }
+      );
+      const data = await res.json();
 
-  //     if (data.success && Array.isArray(data.data.events)) {
-  //       return {
-  //         events: data.data.events,
-  //         totalCount: data.data.totalCount ?? 0,
-  //         error: "",
-  //       };
-  //     }
+      if (data.success && Array.isArray(data.data.events)) {
+        return {
+          events: data.data.events,
+          totalCount: data.data.totalCount ?? 0,
+          error: "",
+        };
+      }
 
-  //     return { events: [], totalCount: 0, error: "Failed to fetch events" };
-  //   } catch (error) {
-  //     return { events: [], totalCount: 0, error: "Failed to fetch events" };
-  //   }
-  // };
+      return { events: [], totalCount: 0, error: "Failed to fetch events" };
+    } catch (error) {
+      return { events: [], totalCount: 0, error: "Failed to fetch events" };
+    }
+  };
 
-  // const { error, events, totalCount } = await fetchEvents();
+  const { error, events, totalCount } = await fetchEvents();
 
-  // if (error) {
-  //   return (
-  //     <div className="bg-gray-200 min-w-screen flex justify-center items-center py-32">
-  //       <p className="text-red-500 text-center">{error}</p>
-  //     </div>
-  //   );
-  // }
+  if (error) {
+    return (
+      <div className="bg-gray-200 min-w-screen flex justify-center items-center py-32">
+        <p className="text-red-500 text-center">{error}</p>
+      </div>
+    );
+  }
 
   // events is always an array here (possibly empty)
-  const totalCount = 50; // Example total count
   const currentPage = parseInt(page, 10) || 1;
   const totalPages = Math.max(1, Math.ceil((totalCount ?? 0) / 10));
 
@@ -64,9 +63,9 @@ async function page({
         </div>
 
         <div className="flex flex-wrap gap-4 justify-start">
-          {/* {events.map((e: any) => (
+          {events.map((e: any) => (
             <EventCard key={e._id} booked={20} {...e} />
-          ))} */}
+          ))}
         </div>
 
         <div className="text-indigo-700 font-semibold mt-3 text-lg">
