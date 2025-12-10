@@ -14,7 +14,7 @@ async function Featured() {
       return {events:[],totalCount:0,error:"Failed to fetch events"}
     }
   }
-  const {events,error=""}:any =await fetchEvents()
+  const {events=[],error=""}:any =await fetchEvents()
 
   if(error){
     return <div className='bg-gray-100 py-32 ' id='featured'>
