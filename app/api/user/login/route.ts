@@ -26,12 +26,12 @@ export async function POST(request: NextRequest) {
       {
         name: "refreshToken",
         value: refreshToken,
-        options: { httpOnly: true, path: "/api/user/refresh-token" },
+        options: { httpOnly: true, path: "/api/user/refresh-token", sameSite: "none", secure: true },
       },
       {
         name: "accessToken",
         value: accessToken,
-        options: { httpOnly: true, path: "/" },
+        options: { httpOnly: true, path: "/",sameSite: "none", secure: true },
       },
     ]);
   } catch (error: any) {

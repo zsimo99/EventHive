@@ -5,6 +5,7 @@ import { uploadToCloudinary } from "@/utils/cloudinary";
 import { connectDB } from "@/utils/db.config";
 import { sendError, sendSuccess } from "@/utils/response";
 import { NextRequest } from "next/server";
+import mongoose from "mongoose";
 
 export async function POST(req: NextRequest) {
   try {
@@ -98,6 +99,7 @@ export async function GET(req: NextRequest) {
     const limit = 10;
     const skip = (page - 1) * limit;
     const category = params.get("category");
+    const organizer = params.get("organizer");
     const search = params.get("search")?.toLowerCase() || "";
     await connectDB();
     let match: any = [];
@@ -105,6 +107,9 @@ export async function GET(req: NextRequest) {
       match.push({ title: { $regex: search,$options: "i" } });
       match.push({ description: { $regex: search,$options: "i" } });
       match.push({ tags: { $regex: search,$options: "i" } });
+    }
+    if (organizer) {
+      match.push({ organizer: new mongoose.Types.ObjectId(organizer) });
     }
     const events = await Event.aggregate([
       {
@@ -114,6 +119,22 @@ export async function GET(req: NextRequest) {
       },
       {
         $match: match.length > 0 ? { $or: match } : {},
+      },
+      {
+        $lookup:{
+          from: "bookings",
+          localField: "_id",
+          foreignField: "eventId",
+          as: "bookings",
+          pipeline: [
+            { $match: { status: { $ne: "CANCELLED" } } },
+            { $group: { _id: null, totalBookedSeats: { $sum: "$seats" } } }
+          ],
+        }
+      },
+      { $addFields: {
+          bookedSeats: { $ifNull: [ { $arrayElemAt: [ "$bookings.totalBookedSeats", 0 ] }, 0 ] }
+        }
       },
       {
         $lookup: {
@@ -141,7 +162,12 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-    ]);
+      {
+        $project: {
+          bookings: 0,
+          // owner: { password: 0, email: 0, createdAt: 0, updatedAt: 0 }
+    }
+  } ]);
     return sendSuccess(
       { events: events[0].data, totalCount: events[0].totalCount || 0 },
       "Events fetched successfully"

@@ -1,4 +1,9 @@
 import Image from "next/image";
+import Link from "next/link";
+import { FaLocationDot } from "react-icons/fa6";
+import { IoIosCalendar } from "react-icons/io";
+import GetTicketsButton from "@/components/GetTicketsButton";
+import ShareEventButton from "@/components/ShareEventButton";
 
 export default async function Page({
   params,
@@ -46,17 +51,27 @@ export default async function Page({
   const eventDate = new Date(event.date);
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-28 pb-24">
+    <div className="bg-gray-50 min-h-screen pt-24 pb-20">
       <div className="container mx-auto px-4">
-        {/* Breadcrumb / small header */}
-        <div className="mb-6 text-sm text-gray-500">
-          <span className="text-indigo-700 font-semibold">EventHive</span>
-          <span className="mx-2">/</span>
-          <span className="capitalize">{event.category}</span>
-          <span className="mx-2">/</span>
-          <span className="text-gray-700 truncate inline-block max-w-xs align-bottom">
-            {event.title}
-          </span>
+        {/* Top bar */}
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="text-sm text-gray-500">
+            <span className="text-indigo-700 font-semibold">EventHive</span>
+            <span className="mx-2">/</span>
+            <span className="capitalize">{event.category}</span>
+            <span className="mx-2">/</span>
+            <span className="text-gray-700 truncate inline-block max-w-xs align-bottom">
+              {event.title}
+            </span>
+          </div>
+
+          <Link
+            href="/browse"
+            className="text-sm text-indigo-700 hover:text-indigo-800 font-medium flex items-center gap-1"
+          >
+            <span>&larr;</span>
+            <span>Back to events</span>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -73,7 +88,7 @@ export default async function Page({
                 />
               </div>
             ) : (
-              <div className="w-full h-64 md:h-80 rounded-2xl bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center text-indigo-700 font-semibold shadow-inner">
+              <div className="w-full h-64 md:h-80 rounded-2xl bg-linear-to-br from-indigo-100 to-indigo-200 flex items-center justify-center text-indigo-700 font-semibold shadow-inner">
                 Image coming soon
               </div>
             )}
@@ -82,18 +97,20 @@ export default async function Page({
           {/* Details card */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-md p-6 md:p-8">
-              <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-indigo-600 font-semibold mb-1">
+              <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
+                <div className="space-y-1">
+                  <span className="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 capitalize">
                     {event.category}
-                  </p>
+                  </span>
                   <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                     {event.title}
                   </h1>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-700">
-                    {event.price === 0 ? "Free event" : `From $${event.price.toFixed(2)}`}
+                <div className="text-right space-y-1">
+                  <p className="text-sm font-semibold text-gray-900">
+                    {event.price === 0
+                      ? "Free event"
+                      : `From $${event.price.toFixed(2)}`}
                   </p>
                   <p className="text-xs text-gray-500">
                     Capacity: <span className="font-medium">{event.capacity}</span>{" "}
@@ -109,7 +126,8 @@ export default async function Page({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-700 text-lg">
-                    📅
+                    <IoIosCalendar />
+
                   </div>
                   <div>
                     <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
@@ -134,7 +152,8 @@ export default async function Page({
 
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-700 text-lg">
-                    📍
+                    <FaLocationDot />
+
                   </div>
                   <div>
                     <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
@@ -152,12 +171,12 @@ export default async function Page({
                   </h2>
                   <div className="flex flex-wrap gap-2">
                     {event.tags.map((tag) => (
-                      <span
+                      <Link href={`/browse?search=${tag}`}
                         key={tag}
                         className="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-700"
                       >
                         #{tag}
-                      </span>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -182,12 +201,8 @@ export default async function Page({
               )}
 
               <div className="mt-6 flex flex-wrap gap-3">
-                <button className="px-6 py-2.5 rounded-xl bg-indigo-700 text-white font-semibold text-sm hover:bg-indigo-800 transition shadow-sm">
-                  Get tickets
-                </button>
-                <button className="px-6 py-2.5 rounded-xl border border-gray-300 text-gray-800 text-sm hover:bg-gray-50 transition">
-                  Share event
-                </button>
+                <GetTicketsButton eventId={event._id} />
+                <ShareEventButton title={event.title} />
               </div>
             </div>
           </div>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React, { useEffect, useRef } from "react";
 import { FaRegUser } from "react-icons/fa6";
 import { IoMdSettings } from "react-icons/io";
@@ -34,12 +35,12 @@ function UserIcon({ logout }: { logout: () => void }) {
           isMenuOpen ? "scale-y-100" : "scale-y-0"
         }`}
       >
-        <li className="hover:bg-blue-400/50 w-full py-2 px-4 flex items-center justify-between">
+        <li> <Link href="/dashboard" className="hover:bg-blue-400/50 w-full py-2 px-4 flex items-center justify-between">
           Dashboard <MdDashboard />
-        </li>
-        <li className="hover:bg-blue-400/50 w-full py-2 px-4 flex items-center justify-between">
+        </Link></li>
+        <li> <Link href="/settings" className="hover:bg-blue-400/50 w-full py-2 px-4 flex items-center justify-between">
           Settings <IoMdSettings />
-        </li>
+        </Link></li>
         <li onClick={logout} className="hover:bg-red-500/60  w-full py-2 px-4 flex items-center justify-between">
           Logout
           <RiLogoutBoxLine className="" />

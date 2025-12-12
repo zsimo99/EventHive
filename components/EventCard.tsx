@@ -20,6 +20,7 @@ function EventCard({ ...props }) {
         hour12: false,
       })
       .replace(",", "") // remove comma before year
+      .replace(",", "") // remove comma before year
       .replace(",", " at");
     return formatted;
   };
@@ -67,16 +68,17 @@ function EventCard({ ...props }) {
         <div className="px-2">
           <div className="flex justify-between text-xs text-gray-600">
             <span>
-              {((props.booked / props.capacity) * 100).toFixed(0)}% booked
+              {((props.bookedSeats  * 100) / props.capacity).toFixed(0)}% booked
+              
             </span>
             <span>
-              {props.booked} / {props.capacity}
+              {props.bookedSeats} / {props.capacity}
             </span>
           </div>
           <div className="w-full h-2 bg-gray-200 rounded-full mt-1">
             <div
               className="h-2 bg-indigo-600 rounded-full"
-              style={{ width: `${(props.booked / props.capacity) * 100}%` }}
+              style={{ width: `${(props.bookedSeats / props.capacity) * 100}%` }}
             ></div>
           </div>
         </div>
