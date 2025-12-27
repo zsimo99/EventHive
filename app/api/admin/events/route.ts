@@ -1,5 +1,6 @@
 import { verifyAccessToken } from "@/lib/auth";
 import User from "@/models/User.model";
+import Event from "@/models/Event.model";
 import { connectDB } from "@/utils/db.config";
 import { sendError, sendSuccess } from "@/utils/response";
 import { NextRequest } from "next/server";
@@ -27,23 +28,22 @@ export async function GET(req: NextRequest) {
     const query = search
       ? {
           $or: [
-            { userName: { $regex: search, $options: "i" } },
-            { email: { $regex: search, $options: "i" } },
+            { title: { $regex: search, $options: "i" } },
+            { description: { $regex: search, $options: "i" } },
+            { location: { $regex: search, $options: "i" } },
           ],
         }
       : {};
 
-    const users = await User.find(
-      query,
-      "userName email role createdAt avatar emailVerified isBlocked"
-    )
+    const events = await Event.find(query)
+      .populate("organizer", "userName email")
       .sort({ createdAt: -1 })
       .limit(20)
       .lean();
 
-    return sendSuccess(users, "Users fetched successfully");
+    return sendSuccess(events, "Events fetched successfully");
   } catch (error) {
-    console.error("Admin users GET error", error);
+    console.error("Admin events GET error", error);
     return sendError("Internal Server Error", 500);
   }
 }

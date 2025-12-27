@@ -33,19 +33,43 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const role = body?.role as "admin" | "user" | "organizer" | undefined;
+    const { role, isBlocked } = body;
 
-    if (!role || !["admin", "user", "organizer"].includes(role)) {
+    // Validate role if provided
+    if (role !== undefined && !["admin", "user", "organizer"].includes(role)) {
       return sendError("Invalid role", 400);
+    }
+
+    // Build update object
+    const updateData: { role?: string; isBlocked?: boolean } = {};
+    if (role !== undefined) {
+      updateData.role = role;
+    }
+    if (isBlocked !== undefined) {
+      updateData.isBlocked = isBlocked;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return sendError("No valid update data provided", 400);
+    }
+
+    // Prevent admin from blocking themselves
+    if (id === payload._id && isBlocked === true) {
+      return sendError("You cannot block yourself", 400);
+    }
+
+    // Prevent admin from changing their own role
+    if (id === payload._id && role !== undefined) {
+      return sendError("You cannot change your own role", 400);
     }
 
     const updated = await User.findByIdAndUpdate(
       id,
-      { role },
+      updateData,
       {
         new: true,
         runValidators: true,
-        select: "userName email role createdAt avatar emailVerified",
+        select: "userName email role createdAt avatar emailVerified isBlocked",
       }
     );
 
@@ -53,7 +77,7 @@ export async function PATCH(
       return sendError("User not found", 404);
     }
 
-    return sendSuccess(updated, "User role updated successfully");
+    return sendSuccess(updated, "User updated successfully");
   } catch (error) {
     console.error("Admin user PATCH error", error);
     return sendError("Internal Server Error", 500);

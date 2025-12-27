@@ -1,12 +1,23 @@
 import { verifyAccessToken } from "@/lib/auth";
 import User from "@/models/User.model";
+import Event from "@/models/Event.model";
+import { Booking } from "@/models/Booking.model";
 import { connectDB } from "@/utils/db.config";
 import { sendError, sendSuccess } from "@/utils/response";
+import mongoose from "mongoose";
 import { NextRequest } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params;
     await connectDB();
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return sendError("Invalid event ID", 400);
+    }
 
     const token = req.cookies.get("accessToken")?.value;
     if (!token) {
@@ -23,27 +34,20 @@ export async function GET(req: NextRequest) {
       return sendError("Forbidden", 403);
     }
 
-    const search = req.nextUrl.searchParams.get("search")?.trim() || "";
-    const query = search
-      ? {
-          $or: [
-            { userName: { $regex: search, $options: "i" } },
-            { email: { $regex: search, $options: "i" } },
-          ],
-        }
-      : {};
+    const event = await Event.findById(id);
+    if (!event) {
+      return sendError("Event not found", 404);
+    }
 
-    const users = await User.find(
-      query,
-      "userName email role createdAt avatar emailVerified isBlocked"
-    )
-      .sort({ createdAt: -1 })
-      .limit(20)
-      .lean();
+    // Delete all bookings associated with this event
+    await Booking.deleteMany({ eventId: id });
 
-    return sendSuccess(users, "Users fetched successfully");
+    // Delete the event
+    await Event.findByIdAndDelete(id);
+
+    return sendSuccess({}, "Event deleted successfully");
   } catch (error) {
-    console.error("Admin users GET error", error);
+    console.error("Admin event DELETE error", error);
     return sendError("Internal Server Error", 500);
   }
 }

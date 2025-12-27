@@ -9,6 +9,7 @@ export interface IUser extends Document {
   password: string;
   refreshToken?: string;
   role: "admin" | "user" | "organizer";
+  isBlocked: boolean;
   createdAt: Date;
   updatedAt: Date;
   emailVerified: boolean;
@@ -62,6 +63,10 @@ const userSchema = new Schema<IUser>(
         message: "Role must be one of: admin, user, or organizer",
       },
       default: "user",
+    },
+    isBlocked: {
+      type: Boolean,
+      default: false,
     },
     emailVerified: {
       type: Boolean,

@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     }
     const bookings = await Booking.find({ userId: user._id }).populate(
       "eventId",
-      "title"
+      "title date location image price"
     );
     return sendSuccess(bookings, "Bookings fetched successfully");
   } catch (error) {

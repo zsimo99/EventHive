@@ -1,17 +1,49 @@
-import { cookies } from "next/headers";
-import DashboardActions from "@/components/DashboardActions";
-import UserTicketsSection from "@/components/UserTicketsSection";
-import AdminUsersSection from "@/components/AdminUsersSection";
+"use client";
 
-type DashboardEvent = {
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import DashboardActions from "@/components/DashboardActions";
+import UserDashboard from "@/components/UserDashboard";
+import OrganizerDashboard from "@/components/OrganizerDashboard";
+import AdminDashboard from "@/components/AdminDashboard";
+
+type EventSpending = {
   title: string;
-  totalGain: number;
+  totalSpent: number;
 };
 
-type DashboardData = {
-  _id: string | null;
-  totalGain: number;
-  events: DashboardEvent[];
+type OrganizerEvent = {
+  _id: string;
+  title: string;
+  date: string;
+  location: string;
+  price: number;
+  capacity: number;
+  image?: string;
+  category: string;
+  eventTotalGain: number;
+  totalBookings: number;
+  totalSeatsBooked: number;
+};
+
+type UserData = {
+  totalSpent: number;
+  totalBookings: number;
+  eventsBooked: EventSpending[];
+};
+
+type OrganizerData = {
+  totalRevenue: number;
+  totalEvents: number;
+  totalBookingsReceived: number;
+  events: OrganizerEvent[];
+};
+
+type AdminData = {
+  totalUsers: number;
+  totalEvents: number;
+  totalRevenue: number;
+  totalBookings: number;
 };
 
 type DashboardUser = {
@@ -19,53 +51,98 @@ type DashboardUser = {
   avatar: string | null;
   userName: string;
   email: string;
-  role: string;
+  role: "admin" | "user" | "organizer";
+  isBlocked?: boolean;
   emailVerified: boolean;
   createdAt: string;
   updatedAt: string;
-  data: DashboardData;
+  userData?: UserData;
+  organizerData?: OrganizerData;
+  adminData?: AdminData;
 };
 
-async function DashboardPage() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken")?.value;
+export default function DashboardPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<DashboardUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // For organizers: toggle between user view and organizer view
+  const [activeView, setActiveView] = useState<"user" | "organizer">("organizer");
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard`,
-    {
-      headers: {
-        Cookie: token ? `accessToken=${token}` : "",
-      },
-      cache: "no-store",
-    }
-  );
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const res = await fetch("/api/dashboard", {
+          credentials: "include",
+        });
+        const payload = await res.json();
 
-  const payload = await res.json();
+        if (!res.ok || !payload.success) {
+          setError(payload.message || "Failed to load dashboard");
+          return;
+        }
 
-  if (!payload.success) {
+        setUser(payload.data as DashboardUser);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load dashboard");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboard();
+  }, []);
+
+  if (loading) {
     return (
-      <div className="bg-gray-100 min-h-screen flex items-center justify-center px-4">
+      <div className="bg-gray-100 min-h-screen flex items-center justify-center px-4 pt-20">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-md p-8 text-center">
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">
-            Unable to load dashboard
-          </h1>
-          <p className="text-gray-600 text-sm mb-1">
-            {(payload as { message?: string }).message ||
-              "Please try again in a moment."}
-          </p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
-  const user = payload.data as DashboardUser;
-  const stats = user.data;
+  if (error || !user) {
+    return (
+      <div className="bg-gray-100 min-h-screen flex items-center justify-center px-4 pt-20">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-md p-8 text-center">
+          <div className="rounded-full bg-red-100 p-3 w-12 h-12 mx-auto flex items-center justify-center">
+            <svg
+              className="h-6 w-6 text-red-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          </div>
+          <h1 className="mt-4 text-xl font-semibold text-gray-900">
+            Unable to load dashboard
+          </h1>
+          <p className="mt-2 text-gray-600 text-sm">{error || "Please try again."}</p>
+          <button
+            onClick={() => router.push("/login")}
+            className="mt-4 inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const joinedAt = new Date(user.createdAt);
-
   const isAdmin = user.role === "admin";
   const isOrganizer = user.role === "organizer";
-  const isOrganizerOrAdmin = isAdmin || isOrganizer;
 
   return (
     <main className="min-h-screen bg-gray-50 pt-24 pb-16">
@@ -121,110 +198,81 @@ async function DashboardPage() {
           </div>
         </header>
 
-        {/* Overview cards (not for admin) */}
-        {!isAdmin && (
-          <section className="grid gap-4 md:grid-cols-3">
-            <div className="col-span-2 rounded-2xl bg-white p-6 shadow-sm">
-              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                {isOrganizer ? "Total earnings" : "Total spent"}
-              </h2>
-              <p className="text-3xl font-bold text-gray-900">
-                ${stats.totalGain.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </p>
-              <p className="mt-2 text-sm text-gray-600">
-                {isOrganizer
-                  ? "Revenue generated across all your events."
-                  : "Money spent on your bookings."}
-              </p>
+        {/* Organizer View Toggle */}
+        {isOrganizer && (
+          <div className="flex items-center justify-center">
+            <div className="inline-flex rounded-xl bg-gray-100 p-1">
+              <button
+                onClick={() => setActiveView("organizer")}
+                className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeView === "organizer"
+                    ? "bg-white text-indigo-600 shadow-sm"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                    />
+                  </svg>
+                  Organizer Dashboard
+                </span>
+              </button>
+              <button
+                onClick={() => setActiveView("user")}
+                className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeView === "user"
+                    ? "bg-white text-indigo-600 shadow-sm"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  My Tickets
+                </span>
+              </button>
             </div>
-
-            <div className="rounded-2xl bg-white p-6 shadow-sm flex flex-col justify-center">
-              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                {isOrganizer ? "Active events" : "Events booked"}
-              </h2>
-              <p className="text-3xl font-bold text-gray-900">
-                {stats.events.length}
-              </p>
-              <p className="mt-2 text-sm text-gray-600">
-                {isOrganizer
-                  ? "Events contributing to your current earnings."
-                  : "Events you have booked so far."}
-              </p>
-            </div>
-          </section>
+          </div>
         )}
 
-        {/* Events / bookings breakdown (not for admin) */}
-        {!isAdmin && (
-          <section className="rounded-2xl bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                  {isOrganizer ? "Earnings by event" : "Spending by event"}
-                </h2>
-                <p className="text-xs text-gray-500 mt-1">
-                  {isOrganizer
-                    ? "Overview of how much each event has generated."
-                    : "Overview of how much you have spent per event."}
-                </p>
-              </div>
-            </div>
-
-            {stats.events.length === 0 ? (
-              <p className="text-sm text-gray-600">
-                {isOrganizer
-                  ? "You don&apos;t have any events with earnings yet. Create an event to see your revenue here."
-                  : "You don&apos;t have any bookings yet. Browse events and book tickets to see your activity here."}
-              </p>
-            ) : (
-              <div className="overflow-x-auto -mx-2 sm:mx-0">
-                <table className="min-w-full divide-y divide-gray-200 text-sm">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th
-                        scope="col"
-                        className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500"
-                      >
-                        Event
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500"
-                      >
-                        Total gain
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {stats.events.map((event) => (
-                      <tr key={event.title}>
-                        <td className="px-3 py-2 text-gray-800 font-medium">
-                          {event.title}
-                        </td>
-                        <td className="px-3 py-2 text-right text-gray-900">
-                          ${event.totalGain.toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
+        {/* Dashboard Content */}
+        {isAdmin && user.adminData && (
+          <AdminDashboard adminData={user.adminData} />
         )}
 
-        {/* Role-specific extra sections */}
-        {!isOrganizerOrAdmin && <UserTicketsSection />}
-        {isAdmin && <AdminUsersSection />}
+        {isOrganizer && activeView === "organizer" && user.organizerData && (
+          <OrganizerDashboard organizerData={user.organizerData} />
+        )}
+
+        {isOrganizer && activeView === "user" && user.userData && (
+          <UserDashboard userData={user.userData} />
+        )}
+
+        {!isAdmin && !isOrganizer && user.userData && (
+          <UserDashboard userData={user.userData} />
+        )}
       </div>
     </main>
   );
 }
-
-export default DashboardPage;

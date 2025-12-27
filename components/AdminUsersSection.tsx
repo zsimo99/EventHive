@@ -10,6 +10,7 @@ type AdminUser = {
   role: "admin" | "user" | "organizer";
   avatar?: string | null;
   emailVerified: boolean;
+  isBlocked?: boolean;
   createdAt: string;
 };
 
@@ -61,29 +62,36 @@ export default function AdminUsersSection() {
     }
   }, [error]);
 
-  const updateRole = async (id: string, role: "admin" | "user" | "organizer") => {
+  const updateUser = async (
+    id: string,
+    updates: { role?: "admin" | "user" | "organizer"; isBlocked?: boolean }
+  ) => {
     try {
       setUpdatingId(id);
       const res = await fetch(`/api/admin/users/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ role }),
+        body: JSON.stringify(updates),
       });
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        toast.error(data.message || "Failed to update role");
+        toast.error(data.message || "Failed to update user");
         return;
       }
 
-      toast.success("User role updated");
+      toast.success("User updated successfully");
       setUsers((prev) =>
-        prev.map((u) => (u._id === id ? { ...u, role: data.data.role } : u))
+        prev.map((u) =>
+          u._id === id
+            ? { ...u, role: data.data.role, isBlocked: data.data.isBlocked }
+            : u
+        )
       );
     } catch (err) {
       console.error(err);
-      toast.error("Failed to update role");
+      toast.error("Failed to update user");
     } finally {
       setUpdatingId(null);
     }
@@ -93,7 +101,7 @@ export default function AdminUsersSection() {
     return (
       <section className="rounded-2xl bg-white p-6 shadow-sm">
         <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
-          User management
+          User Management
         </h2>
         <p className="text-sm text-gray-600">Loading users...</p>
       </section>
@@ -104,7 +112,7 @@ export default function AdminUsersSection() {
     return (
       <section className="rounded-2xl bg-white p-6 shadow-sm">
         <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
-          User management
+          User Management
         </h2>
         <p className="text-sm text-red-600">{error}</p>
       </section>
@@ -114,24 +122,39 @@ export default function AdminUsersSection() {
   return (
     <section className="rounded-2xl bg-white p-6 shadow-sm">
       <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
-        User management
+        User Management
       </h2>
       <p className="text-xs text-gray-500 mb-4">
-        View all users and promote regular users to organizers.
+        Search users, change roles, and manage user access.
       </p>
 
       <div className="mb-4 flex items-center gap-2">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => {
-            const value = e.target.value;
-            setSearch(value);
-            loadUsers(value);
-          }}
-          placeholder="Search by name or email..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600"
-        />
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSearch(value);
+              loadUsers(value);
+            }}
+            placeholder="Search by name or email..."
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 pl-10 text-sm focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600"
+          />
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
         {searching && (
           <span className="text-xs text-gray-500 whitespace-nowrap">
             Searching...
@@ -155,6 +178,9 @@ export default function AdminUsersSection() {
                 <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Role
                 </th>
+                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Status
+                </th>
                 <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Joined
                 </th>
@@ -166,23 +192,51 @@ export default function AdminUsersSection() {
             <tbody className="divide-y divide-gray-100">
               {users.map((user) => {
                 const createdAt = new Date(user.createdAt);
+                const isUpdating = updatingId === user._id;
                 return (
-                  <tr key={user._id}>
+                  <tr
+                    key={user._id}
+                    className={user.isBlocked ? "bg-red-50" : ""}
+                  >
                     <td className="px-3 py-2 text-gray-800 font-medium">
-                      {user.userName}
+                      <div className="flex items-center gap-2">
+                        {user.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt={user.userName}
+                            className="h-8 w-8 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-8 w-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-semibold">
+                            {user.userName.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <span>{user.userName}</span>
+                      </div>
                     </td>
                     <td className="px-3 py-2 text-gray-700">{user.email}</td>
                     <td className="px-3 py-2">
                       <span
                         className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${
                           user.role === "admin"
-                            ? "bg-red-50 text-red-700"
+                            ? "bg-purple-50 text-purple-700"
                             : user.role === "organizer"
                             ? "bg-indigo-50 text-indigo-700"
                             : "bg-gray-100 text-gray-800"
                         }`}
                       >
                         {user.role}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2">
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
+                          user.isBlocked
+                            ? "bg-red-100 text-red-700"
+                            : "bg-green-50 text-green-700"
+                        }`}
+                      >
+                        {user.isBlocked ? "Blocked" : "Active"}
                       </span>
                     </td>
                     <td className="px-3 py-2 text-right text-gray-600 text-xs">
@@ -193,20 +247,49 @@ export default function AdminUsersSection() {
                       })}
                     </td>
                     <td className="px-3 py-2 text-right">
-                      <div className="inline-flex gap-2">
-                        {user.role === "user" && (
+                      {user.role !== "admin" && (
+                        <div className="flex flex-wrap justify-end gap-2">
+                          {/* Role change dropdown */}
+                          <select
+                            value={user.role}
+                            onChange={(e) =>
+                              updateUser(user._id, {
+                                role: e.target.value as "user" | "organizer",
+                              })
+                            }
+                            disabled={isUpdating}
+                            className="rounded-lg border border-gray-300 px-2 py-1 text-xs focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 disabled:opacity-60"
+                          >
+                            <option value="user">User</option>
+                            <option value="organizer">Organizer</option>
+                          </select>
+
+                          {/* Block/Unblock button */}
                           <button
                             type="button"
-                            onClick={() => updateRole(user._id, "organizer")}
-                            disabled={updatingId === user._id}
-                            className="rounded-lg bg-indigo-600 px-3 py-1 text-xs font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+                            onClick={() =>
+                              updateUser(user._id, {
+                                isBlocked: !user.isBlocked,
+                              })
+                            }
+                            disabled={isUpdating}
+                            className={`rounded-lg px-3 py-1 text-xs font-semibold disabled:opacity-60 ${
+                              user.isBlocked
+                                ? "bg-green-600 text-white hover:bg-green-700"
+                                : "bg-red-600 text-white hover:bg-red-700"
+                            }`}
                           >
-                            {updatingId === user._id
-                              ? "Updating..."
-                              : "Make organizer"}
+                            {isUpdating
+                              ? "..."
+                              : user.isBlocked
+                              ? "Unblock"
+                              : "Block"}
                           </button>
-                        )}
-                      </div>
+                        </div>
+                      )}
+                      {user.role === "admin" && (
+                        <span className="text-xs text-gray-400">Admin</span>
+                      )}
                     </td>
                   </tr>
                 );
