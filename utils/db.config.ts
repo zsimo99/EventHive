@@ -37,6 +37,7 @@ export const connectDB = async (): Promise<Mongoose> => {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      dbName:"event-hive"
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
