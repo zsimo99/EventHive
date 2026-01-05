@@ -1,0 +1,7 @@
+  // gap-4 in Tailwind = 16px; account for gaps in slideWidth calculation
+  const gapSize = 16;
+  const totalGapWidth = Math.max(0, (slidesPerView - 1) * gapSize);
+  const slideWidth = containerWidth ? (containerWidth - totalGapWidth) / slidesPerView : 0;
+  
+  // Translate by slide + gap to account for spacing
+  const translateX = -current * (slideWidth + gapSize);

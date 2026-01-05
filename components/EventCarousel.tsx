@@ -97,11 +97,16 @@ export default function EventCarousel({ events }: { events: EventType[] }) {
   // center index within the visible window (used to highlight middle slide)
   const centerOffset = Math.floor(slidesPerView / 2);
 
-  const slideWidth = containerWidth ? containerWidth / slidesPerView : 0;
-  const translateX = -current * slideWidth;
+  // gap-4 in Tailwind = 16px; account for gaps in slideWidth calculation
+  const gapSize = 16;
+  const totalGapWidth = Math.max(0, (slidesPerView - 1) * gapSize);
+  const slideWidth = containerWidth ? (containerWidth - totalGapWidth) / slidesPerView : 0;
+  
+  // Translate by slide + gap to account for spacing
+  const translateX = -current * (slideWidth + gapSize);
 
   return (
-    <div className="relative  px-8" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+    <div className="relative px-8" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
       <div
         ref={containerRef}
         onTouchStart={onTouchStart}
@@ -127,7 +132,7 @@ export default function EventCarousel({ events }: { events: EventType[] }) {
                 key={e._id}
                 style={{ width: slideWidth ? `${slideWidth}px` : `${100 / slidesPerView}%` }}
                 className={`flex-shrink-0 transition-transform duration-500 ${
-                  isHighlighted ? "scale-105 z-20" : "scale-95 z-10 opacity-95"
+                  isHighlighted ? "scale-95 z-20" : "scale-90 z-10 opacity-95"
                 }`}
               >
                 <div className="px-2">
