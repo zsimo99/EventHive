@@ -194,7 +194,7 @@ export default function DashboardPage() {
               )}
             </div>
 
-            <DashboardActions />
+            {isOrganizer && <DashboardActions />}
           </div>
         </header>
 

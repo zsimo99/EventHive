@@ -27,6 +27,7 @@ async function page({
 
       return { events: [], totalCount: 0, error: "Failed to fetch events" };
     } catch (error) {
+      console.log(error)
       return { events: [], totalCount: 0, error: "Failed to fetch events" };
     }
   };

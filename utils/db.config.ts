@@ -1,10 +1,6 @@
 import mongoose, { Mongoose } from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
-
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
+const MONGODB_URI = process.env.MONGODB_URI as string | undefined;
 
 // Interface to define the shape of our cached connection
 interface MongooseConnection {
@@ -27,6 +23,10 @@ if (!global.mongoose) {
 }
 
 export const connectDB = async (): Promise<Mongoose> => {
+  // Ensure the connection string is available at runtime (avoid throwing at module import)
+  if (!MONGODB_URI) {
+    throw new Error('Please define the MONGODB_URI environment variable in the production environment');
+  }
   // 1. If a connection already exists, return it immediately
   if (cached.conn) {
     console.log('Using cached database connection');
