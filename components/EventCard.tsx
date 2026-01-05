@@ -26,7 +26,7 @@ function EventCard({ ...props }) {
   };
 
   const bookingPercentage = ((props.bookedSeats * 100) / props.capacity).toFixed(0);
-  const seatsAvailable = props.capacity - props.booked;
+  const seatsAvailable = props.capacity - props.bookedSeats;
   const isSoldOut = seatsAvailable <= 0;
 
   const categoryColors = {
