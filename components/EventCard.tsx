@@ -30,9 +30,9 @@ function EventCard({ ...props }) {
   const isSoldOut = seatsAvailable <= 0;
 
   const categoryColors = {
-    concerts: { bg: "from-purple-600 to-pink-600", light: "bg-purple-100", text: "text-purple-700" },
-    workshops: { bg: "from-green-600 to-emerald-600", light: "bg-green-100", text: "text-green-700" },
-    default: { bg: "from-red-600 to-orange-600", light: "bg-red-100", text: "text-red-700" }
+    concerts: { bg: "from-purple-600 to-pink-600", light: "bg-purple-100", text: "text-purple-800" },
+    workshops: { bg: "from-green-600 to-emerald-600", light: "bg-green-100", text: "text-green-800" },
+    default: { bg: "from-orange-600 to-red-600", light: "bg-orange-100", text: "text-orange-800" }
   };
 
   const colors = props.category === "concerts" ? categoryColors.concerts : props.category === "workshops" ? categoryColors.workshops : categoryColors.default;

@@ -1,5 +1,6 @@
 import React from 'react'
 import EventCard from './EventCard'
+import EventCarousel from './EventCarousel';
 
 async function Featured() {
   const fetchEvents = async () => {
@@ -44,10 +45,8 @@ async function Featured() {
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-700">
         Featured Events
       </h1>
-      <div className="container mx-auto px-4 flex flex-wrap gap-4 justify-start">
-        {events.map((e: any) => (
-          <EventCard key={e._id} booked={20} {...e} />
-        ))}
+      <div className="container mx-auto ">
+        <EventCarousel events={events} />
       </div>
     </div>
   );

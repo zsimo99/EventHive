@@ -62,7 +62,7 @@ async function page({
           <HeroSearch />
         </div>
 
-        <div className="flex flex-wrap gap-4 justify-start">
+        <div className="flex container flex-wrap gap-4 justify-start">
           {events.map((e: any) => (
             <EventCard key={e._id} booked={20} {...e} />
           ))}
