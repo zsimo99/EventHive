@@ -19,7 +19,7 @@ export const sendMail = async ({
     service: "gmail",
     auth: {
       user: "mohamedzoraa100@gmail.com", // your Gmail
-      pass: "hxnk jisx sjdn aufm",       // App Password
+      pass: process.env.GOOGLE_SECRET,       // App Password
     },
   });
 
